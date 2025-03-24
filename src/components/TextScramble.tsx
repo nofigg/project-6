@@ -38,7 +38,7 @@ class TextScrambleEffect {
     const text = this.originalText;
     const oldText = this.el.textContent || '';
     const length = Math.max(oldText.length, text.length);
-    const promise = new Promise((resolve) => (this.resolve = resolve));
+    const promise = new Promise<void>((resolve) => (this.resolve = resolve));
     this.queue = [];
 
     for (let i = 0; i < length; i++) {
