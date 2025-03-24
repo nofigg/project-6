@@ -1,14 +1,14 @@
 {
   "extends": [
+    "next/core-web-vitals",
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
-    "plugin:react-refresh/recommended",
     "plugin:@typescript-eslint/recommended",
     "prettier"
   ],
   "plugins": ["react-refresh"],
   "rules": {
-    "react-refresh/only-export-components": ["warn", { "allowConstantExport": true }]
+    "react-refresh/only-export-components": ["error", { "allowConstantExport": true }]
   },
   "settings": {
     "react": {
