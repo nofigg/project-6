@@ -20,7 +20,7 @@ class TextScrambleEffect {
   private queue: QueueItem[];
   private frame: number;
   private frameRequest: number;
-  private resolve: ((value: unknown) => void) | null;
+  private resolve: ((value: void) => void) | null;
   private originalText: string;
   private isAnimating: boolean;
   private readonly frameInterval: number = 1000 / 41.67;
@@ -45,8 +45,8 @@ class TextScrambleEffect {
     }
   }
 
-  scramble() {
-    if (this.isAnimating) return;
+  scramble(): Promise<void> {
+    if (this.isAnimating) return Promise.resolve();
     this.isAnimating = true;
 
     const text = this.originalText;
