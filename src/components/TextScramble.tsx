@@ -1,9 +1,23 @@
-import { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
+
+interface TextScrambleProps {
+  text: string;
+  className?: string;
+  delay?: number;
+}
+
+interface QueueItem {
+  from: string;
+  to: string;
+  start: number;
+  end: number;
+  char?: string;
+}
 
 class TextScrambleEffect {
   private el: HTMLElement;
   private chars: string;
-  private queue: { from: string; to: string; start: number; end: number; char?: string }[];
+  private queue: QueueItem[];
   private frame: number;
   private frameRequest: number;
   private resolve: ((value: unknown) => void) | null;
@@ -101,12 +115,6 @@ class TextScrambleEffect {
     cancelAnimationFrame(this.frameRequest);
     this.isAnimating = false;
   }
-}
-
-interface TextScrambleProps {
-  text: string;
-  className?: string;
-  delay?: number;
 }
 
 function TextScramble({ text, className = '', delay = 0 }: TextScrambleProps) {

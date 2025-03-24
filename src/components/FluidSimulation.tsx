@@ -1,130 +1,143 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
-class SpotlightEffect {
-  private canvas: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D;
-  private mouseX: number = 0;
-  private mouseY: number = 0;
-  private frameId: number = 0;
-  private isActive: boolean = true;
-  private dpr: number;
-  private lastRenderTime: number = 0;
-  private readonly targetFPS: number = 30;
-  private readonly frameInterval: number = 1000 / 30;
-
-  constructor(canvas: HTMLCanvasElement) {
-    this.canvas = canvas;
-    const ctx = canvas.getContext('2d', { alpha: false });
-    if (!ctx) throw new Error('2D context not supported');
-    this.ctx = ctx;
-    this.dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-    this.resize();
-    this.addEventListeners();
-    this.animate();
-  }
-
-  private resize = () => {
-    const { width, height } = this.canvas.getBoundingClientRect();
-    this.canvas.width = width * this.dpr;
-    this.canvas.height = height * this.dpr;
-    this.ctx.scale(this.dpr, this.dpr);
-  };
-
-  private handleMouseMove = (e: MouseEvent) => {
-    const rect = this.canvas.getBoundingClientRect();
-    this.mouseX = (e.clientX - rect.left) * this.dpr;
-    this.mouseY = (e.clientY - rect.top) * this.dpr;
-  };
-
-  private addEventListeners() {
-    const throttledMouseMove = this.throttle(this.handleMouseMove, 16);
-    window.addEventListener('resize', this.resize, { passive: true });
-    window.addEventListener('mousemove', throttledMouseMove, { passive: true });
-    document.addEventListener('visibilitychange', () => {
-      this.isActive = document.visibilityState === 'visible';
-      if (this.isActive) this.animate();
-    });
-  }
-
-  private throttle(func: Function, limit: number) {
-    let inThrottle: boolean;
-    return function (this: any, ...args: any[]) {
-      if (!inThrottle) {
-        func.apply(this, args);
-        inThrottle = true;
-        setTimeout(() => (inThrottle = false), limit);
-      }
-    };
-  }
-
-  private animate = (currentTime: number = 0) => {
-    if (!this.isActive) return;
-
-    const delta = currentTime - this.lastRenderTime;
-    if (delta < this.frameInterval) {
-      this.frameId = requestAnimationFrame(this.animate);
-      return;
-    }
-
-    this.lastRenderTime = currentTime - (delta % this.frameInterval);
-
-    // Clear canvas with background color
-    this.ctx.fillStyle = '#0A0118';
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-    // Create and draw spotlight with optimized gradient
-    const gradient = this.ctx.createRadialGradient(
-      this.mouseX,
-      this.mouseY,
-      0,
-      this.mouseX,
-      this.mouseY,
-      900 * this.dpr
-    );
-
-    gradient.addColorStop(0, 'rgba(124, 58, 237, 0.125)');
-    gradient.addColorStop(0.5, 'rgba(124, 58, 237, 0.0625)');
-    gradient.addColorStop(1, 'rgba(124, 58, 237, 0)');
-
-    this.ctx.fillStyle = gradient;
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-    this.frameId = requestAnimationFrame(this.animate);
-  };
-
-  public cleanup() {
-    window.removeEventListener('resize', this.resize);
-    window.removeEventListener('mousemove', this.handleMouseMove);
-    cancelAnimationFrame(this.frameId);
-  }
+interface FluidSimulationProps {
+  className?: string;
 }
 
-function FluidSimulation() {
+function FluidSimulation({ className = '' }: FluidSimulationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const effectRef = useRef<SpotlightEffect | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (canvas && !effectRef.current) {
-      try {
-        effectRef.current = new SpotlightEffect(canvas);
-      } catch (error) {
-        console.error('Failed to initialize SpotlightEffect:', error);
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const width = canvas.width = window.innerWidth;
+    const height = canvas.height = window.innerHeight;
+
+    let particles: Particle[] = [];
+    let isMousePressed = false;
+    let mouseX = 0;
+    let mouseY = 0;
+
+    class Particle {
+      constructor(
+        public x: number,
+        public y: number,
+        public radius: number,
+        public velocity: { x: number; y: number },
+        public color: string
+      ) {}
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+
+      update() {
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
+
+        if (this.x + this.radius > width || this.x - this.radius < 0) {
+          this.velocity.x = -this.velocity.x;
+        }
+
+        if (this.y + this.radius > height || this.y - this.radius < 0) {
+          this.velocity.y = -this.velocity.y;
+        }
+
+        this.draw();
       }
     }
 
+    const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    };
+
+    const handleMouseDown = () => {
+      isMousePressed = true;
+    };
+
+    const handleMouseUp = () => {
+      isMousePressed = false;
+    };
+
+    const animate = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      particles.forEach((particle, index) => {
+        particle.update();
+
+        for (let i = index + 1; i < particles.length; i++) {
+          const dx = particle.x - particles[i].x;
+          const dy = particle.y - particles[i].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < particle.radius + particles[i].radius) {
+            const angle = Math.atan2(dy, dx);
+            const sin = Math.sin(angle);
+            const cos = Math.cos(angle);
+
+            const tempVelocity = {
+              x: particle.velocity.x * cos + particle.velocity.y * sin,
+              y: particle.velocity.y * cos - particle.velocity.x * sin
+            };
+
+            particle.velocity.x = particles[i].velocity.x * cos + particles[i].velocity.y * sin;
+            particle.velocity.y = particles[i].velocity.y * cos - particles[i].velocity.x * sin;
+
+            particles[i].velocity.x = tempVelocity.x;
+            particles[i].velocity.y = tempVelocity.y;
+          }
+        }
+      });
+
+      requestAnimationFrame(animate);
+    };
+
+    const init = () => {
+      particles = [];
+
+      for (let i = 0; i < 100; i++) {
+        const radius = Math.random() * 5 + 2;
+        const x = Math.random() * (width - radius * 2) + radius;
+        const y = Math.random() * (height - radius * 2) + radius;
+        const velocity = {
+          x: (Math.random() - 0.5) * 2,
+          y: (Math.random() - 0.5) * 2
+        };
+        const color = `hsl(${Math.random() * 360}, 50%, 50%)`;
+
+        particles.push(new Particle(x, y, radius, velocity, color));
+      }
+
+      animate();
+    };
+
+    init();
+
+    window.addEventListener('resize', init);
+    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('mousedown', handleMouseDown);
+    canvas.addEventListener('mouseup', handleMouseUp);
+
     return () => {
-      effectRef.current?.cleanup();
-      effectRef.current = null;
+      window.removeEventListener('resize', init);
+      canvas.removeEventListener('mousemove', handleMouseMove);
+      canvas.removeEventListener('mousedown', handleMouseDown);
+      canvas.removeEventListener('mouseup', handleMouseUp);
     };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 -z-10 h-full w-full"
-      style={{ background: '#0A0118' }}
+      className={`fixed inset-0 pointer-events-none ${className}`}
     />
   );
 }
