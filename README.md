@@ -1,48 +1,77 @@
-# Astro Starter Kit: Basics
+# Nolan Figueroa's Portfolio
 
-```sh
-npm create astro@latest -- --template basics
-```
+A modern, responsive portfolio website built with Next.js, featuring a clean and minimalist design.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
+## 🚀 Features
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+- 🎨 Modern, minimalist design with a dark theme
+- 📱 Fully responsive layout that works on all devices
+- 📚 Project Archive with a mosaic grid layout
+- 📝 Blog section with recent posts
+- 📱 Follow button linking to X.com profile
+- 🏆 Floating banner with a call-to-action
+- 🎨 Custom color scheme with purple accents
+- 🔍 SEO-optimized content
 
-![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
+## 🎨 Color Scheme
+
+- Primary: Purple (`#9F2B68`)
+- Accent: Light Pink (`#F19CBB`)
+- Background: Dark (`#0A0118`)
 
 ## 🚀 Project Structure
 
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
+```
 /
 ├── public/
-│   └── favicon.svg
+│   └── images/
 ├── src/
-│   ├── layouts/
-│   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
+│   ├── components/
+│   │   ├── FloatingBanner.tsx
+│   │   ├── Header.tsx
+│   │   ├── Footer.tsx
+│   │   ├── ProjectGallery.tsx
+│   │   └── TextScramble.tsx
+│   ├── pages/
+│   │   ├── HomePage.tsx
+│   │   └── projects.tsx
+│   └── data/
+│       └── blog.ts
 └── package.json
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## 🛠️ Development
 
-## 🧞 Commands
+### Prerequisites
 
-All commands are run from the root of the project, from a terminal:
+- Node.js (v18 or higher recommended)
+- npm or yarn
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+### Getting Started
 
-## 👀 Want to learn more?
+1. Install dependencies:
+```bash
+npm install
+```
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+2. Start the development server:
+```bash
+npm run dev
+```
+
+The development server will start at `http://localhost:3000`
+
+### Building for Production
+
+```bash
+npm run build
+```
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- Thanks to the Next.js team for their amazing framework
+- Special thanks to Unsplash for providing the mock images used in the project gallery
