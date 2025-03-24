@@ -6,7 +6,7 @@ class TextScrambleEffect {
   private queue: { from: string; to: string; start: number; end: number; char?: string }[];
   private frame: number;
   private frameRequest: number;
-  private resolve!: (value: unknown) => void;
+  private resolve: ((value: unknown) => void) | null;
   private originalText: string;
   private isAnimating: boolean;
   private readonly frameInterval: number = 1000 / 41.67;
