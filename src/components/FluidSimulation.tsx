@@ -12,7 +12,9 @@ function FluidSimulation({ className = '' }: FluidSimulationProps) {
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      throw new Error('Failed to get 2D context');
+    }
 
     const width = canvas.width = window.innerWidth;
     const height = canvas.height = window.innerHeight;
@@ -28,14 +30,14 @@ function FluidSimulation({ className = '' }: FluidSimulationProps) {
         public color: string
       ) {}
 
-      draw() {
+      draw(ctx: CanvasRenderingContext2D) {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fillStyle = this.color;
         ctx.fill();
       }
 
-      update() {
+      update(ctx: CanvasRenderingContext2D) {
         this.x += this.velocity.x;
         this.y += this.velocity.y;
 
@@ -47,7 +49,7 @@ function FluidSimulation({ className = '' }: FluidSimulationProps) {
           this.velocity.y = -this.velocity.y;
         }
 
-        this.draw();
+        this.draw(ctx);
       }
     }
 
@@ -74,7 +76,7 @@ function FluidSimulation({ className = '' }: FluidSimulationProps) {
       ctx.clearRect(0, 0, width, height);
 
       particles.forEach((particle, index) => {
-        particle.update();
+        particle.update(ctx);
 
         for (let i = index + 1; i < particles.length; i++) {
           const dx = particle.x - particles[i].x;
