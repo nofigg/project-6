@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import TextScramble from '../components/TextScramble';
+import Image from 'next/image';
 import { posts } from '../data/blog';
 
 function BlogPost() {
@@ -59,12 +60,13 @@ function BlogPost() {
       </div>
 
       {post.image && (
-        <div className="mb-8">
-          <img
+        <div className="relative w-full h-64 mb-8">
+          <Image
             src={post.image.url}
             alt={post.image.alt}
-            className="aspect-[2/1] w-full rounded-lg bg-gray-900 object-cover"
-            loading="lazy"
+            fill
+            className="object-cover rounded-lg"
+            priority
           />
           {post.image.alt && (
             <p className="mt-2 text-center text-sm text-gray-400">{post.image.alt}</p>

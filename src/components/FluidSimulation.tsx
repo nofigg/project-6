@@ -18,9 +18,6 @@ function FluidSimulation({ className = '' }: FluidSimulationProps) {
     const height = canvas.height = window.innerHeight;
 
     let particles: Particle[] = [];
-    let isMousePressed = false;
-    let mouseX = 0;
-    let mouseY = 0;
 
     class Particle {
       constructor(
@@ -54,17 +51,23 @@ function FluidSimulation({ className = '' }: FluidSimulationProps) {
       }
     }
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    };
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
 
-    const handleMouseDown = () => {
-      isMousePressed = true;
-    };
+      for (let i = 0; i < particles.length; i++) {
+        const dx = particles[i].x - mouseX;
+        const dy = particles[i].y - mouseY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
 
-    const handleMouseUp = () => {
-      isMousePressed = false;
+        if (distance < 100) {
+          const angle = Math.atan2(dy, dx);
+          const force = (100 - distance) / 100;
+          particles[i].velocity.x += force * Math.cos(angle) * 0.1;
+          particles[i].velocity.y += force * Math.sin(angle) * 0.1;
+        }
+      }
     };
 
     const animate = () => {
@@ -123,14 +126,10 @@ function FluidSimulation({ className = '' }: FluidSimulationProps) {
 
     window.addEventListener('resize', init);
     canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('mousedown', handleMouseDown);
-    canvas.addEventListener('mouseup', handleMouseUp);
 
     return () => {
       window.removeEventListener('resize', init);
       canvas.removeEventListener('mousemove', handleMouseMove);
-      canvas.removeEventListener('mousedown', handleMouseDown);
-      canvas.removeEventListener('mouseup', handleMouseUp);
     };
   }, []);
 

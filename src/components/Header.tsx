@@ -1,62 +1,133 @@
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
-function Header() {
+interface HeaderProps {
+  className?: string;
+}
+
+function Header({ className = '' }: HeaderProps) {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogoClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    navigate('/', { replace: true });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 0);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleMobileMenuToggle = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleMobileLinkClick = () => {
+    setIsMobileMenuOpen(false);
   };
 
   return (
-    <header className="py-4">
-      <nav className="relative flex items-center justify-between">
-        <a
-          href="https://x.com/poweredbynolan"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 rounded-sm font-['Smooch'] text-4xl text-white transition-colors duration-300 ease-in-out hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-[#0A0118]"
-          aria-label="Follow me on X.com"
-        >
-          Nolan
-        </a>
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${className} ${
+        isScrolled ? 'bg-primary-900/90 backdrop-blur-sm' : 'bg-transparent'
+      }`}
+    >
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          <Link to="/" className="flex items-center">
+            <span className="text-xl font-bold text-white">Nolan</span>
+          </Link>
 
-        <a
-          href="https://x.com/poweredbynolan"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-md bg-gray-800 px-3 py-2 font-ibm-plex-mono text-sm font-semibold italic text-white transition-colors hover:bg-gray-700 hover:text-gray-300"
-        >
-          Follow Me
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="h-4 w-4"
+          <div className="hidden md:flex items-center space-x-8">
+            <Link to="/" className="text-white hover:text-primary-400 transition-colors">
+              Home
+            </Link>
+            <Link to="/blog" className="text-white hover:text-primary-400 transition-colors">
+              Blog
+            </Link>
+            <Link to="/projects" className="text-white hover:text-primary-400 transition-colors">
+              Projects
+            </Link>
+            <a
+              href="https://x.com/nofigg"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:text-primary-400 transition-colors"
+            >
+              Follow Me
+            </a>
+          </div>
+
+          <button
+            onClick={handleMobileMenuToggle}
+            className="md:hidden text-white focus:outline-none"
           >
-            <path
-              fillRule="evenodd"
-              d="M4.25 5.5a.75.75 0 00-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 00.75-.75v-4a.75.75 0 011.5 0v4A2.25 2.25 0 0112.75 17h-8.5A2.25 2.25 0 012 14.75v-8.5A2.25 2.25 0 014.25 4h5a.75.75 0 010 1.5h-5z"
-              clipRule="evenodd"
-            />
-            <path
-              fillRule="evenodd"
-              d="M6.194 12.753a.75.75 0 001.06.053L16.5 4.44v2.81a.75.75 0 001.5 0v-4.5a.75.75 0 00-.75-.75h-4.5a.75.75 0 000 1.5h2.553l-9.056 8.194a.75.75 0 00-.053 1.06z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </a>
-      </nav>
-      <div
-        className="absolute left-0 right-0 border-t border-gray-800"
-        style={{
-          width: '100vw',
-          marginLeft: 'calc(-50vw + 50%)',
-          marginRight: 'calc(-50vw + 50%)',
-          marginTop: '1rem',
-        }}
-      />
+            <svg
+              className={`w-6 h-6 ${isMobileMenuOpen ? 'hidden' : 'block'}`}
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg
+              className={`w-6 h-6 ${isMobileMenuOpen ? 'block' : 'hidden'}`}
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div
+          className={`md:hidden fixed top-16 left-0 right-0 bg-primary-900/90 backdrop-blur-sm transform transition-transform duration-300 ease-in-out ${
+            isMobileMenuOpen ? 'translate-y-0' : '-translate-y-full'
+          }`}
+        >
+          <nav className="px-4 py-4">
+            <Link
+              to="/"
+              onClick={handleMobileLinkClick}
+              className="block text-white hover:text-primary-400 transition-colors mb-4"
+            >
+              Home
+            </Link>
+            <Link
+              to="/blog"
+              onClick={handleMobileLinkClick}
+              className="block text-white hover:text-primary-400 transition-colors mb-4"
+            >
+              Blog
+            </Link>
+            <Link
+              to="/projects"
+              onClick={handleMobileLinkClick}
+              className="block text-white hover:text-primary-400 transition-colors mb-4"
+            >
+              Projects
+            </Link>
+            <a
+              href="https://x.com/nofigg"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleMobileLinkClick}
+              className="block text-white hover:text-primary-400 transition-colors"
+            >
+              Follow Me
+            </a>
+          </nav>
+        </div>
+      </div>
     </header>
   );
 }

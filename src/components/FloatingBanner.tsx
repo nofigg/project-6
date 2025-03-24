@@ -14,7 +14,7 @@ function FloatingBanner() {
               </svg>
             </span>
             <div className="flex items-center gap-1 lg:inline">
-              <span className="block lg:inline">Let's build something amazing together</span>
+              <span className="block lg:inline">Let&apos;s build something amazing together</span>
               <span aria-hidden="true" className="inline-block">
                 &rarr;
               </span>
